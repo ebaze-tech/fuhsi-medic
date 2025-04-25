@@ -1,6 +1,6 @@
 const mongoose = require("mongoose");
 
-const formSchema = new mongoose.Schema(
+const medicalFormSchema = new mongoose.Schema(
   {
     surname: String,
     otherNames: String,
