@@ -27,7 +27,7 @@ const adminAuthController = async (req, res) => {
             return res.status(400).json({ message: "Invalid password" })
         }
 
-        const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET, { expiresIn: process.env.JWT_EXPIRES_IN || "1d" })
+        const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET, { expiresIn: process.env.JWT_EXPIRES_IN || "1h" })
         const userDetails = {
             id: user._id, email: user.email
         }
@@ -52,8 +52,6 @@ const adminRegisterController = async (req, res) => {
     }
 
     try {
-        const adminNumber = Math.floor(100000 + Math.random() * 900000)
-
         const existingUserByEmail = await Admin.findOne({ email })
         if (existingUserByEmail) {
             console.log('Email is already in use')
@@ -73,7 +71,7 @@ const adminRegisterController = async (req, res) => {
 
         // Generate JWT token
         const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET, {
-            expiresIn: '1d'
+            expiresIn: '1h'
         })
 
         console.log('Admin registered successfully:', { user, token })
@@ -104,21 +102,77 @@ const userAuthController = async (req, res) => {
             return res.status(400).json({ message: "Invalid UTME Number" })
         }
 
-        const surnameMatch = await User.findOne({ surname })
-        if (!surnameMatch) {
-            console.log("Surname not found")
-            return res.status(400).json({ message: "Surname not found" })
+        if (user.surname !== surname) {
+            return res.status(400).json({ message: "Surname does not match" });
         }
 
-        const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET, { expiresIn: '1d' })
+        const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET, { expiresIn: '1h' })
         const userDetails = {
             id: user._id, surname: user.surname, utmeNo: user.utmeNo
         }
-        console.log("Login successfuk", { user: userDetails, token })
+        console.log("Login successful", { user: userDetails, token })
+        return res.status(200).json({
+            message: "Login successful",
+            data: {
+                token,
+                user: userDetails
+            }
+        });
+
     } catch (error) {
         console.error("Login error:", error)
         return res.status(500).json({ message: "Login error:", error })
     }
 }
 
-module.exports = { adminAuthController, adminRegisterController, userAuthController }
+const userRegisterController = async (req, res) => {
+    const { utmeNo, surname } = req.body
+
+    if (!utmeNo || !surname) {
+        console.log('All fields are required')
+        return res.status(400).json({ message: 'All fields are required' })
+    }
+
+    try {
+
+        const existingUserByUtmeNo = await User.findOne({ utmeNo })
+        if (existingUserByUtmeNo) {
+            console.log('UTME Number is already in use')
+            return res.status(400).json({ message: 'UTME Number already used' })
+        }
+
+        const existingUserBySurname = await User.findOne({ surname })
+        if (existingUserBySurname) {
+            console.log('Surname is already in use')
+            return res.status(400).json({ message: 'Surname already used' })
+        }
+
+
+        // Create new user
+        const user = new User({
+            utmeNo, surname
+        })
+        await user.save()
+
+
+        // Generate JWT token
+        const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET, {
+            expiresIn: '1h'
+        })
+
+        console.log('User registered successfully:', { user, token })
+        res.status(201).json({
+            message: 'User registered successfully.',
+            user: {
+                id: user._id,
+                email: user.email
+            },
+            token
+        })
+    } catch (error) {
+        console.error('Registration error:', error)
+        res.status(500).json({ message: 'Error registering user', error })
+    }
+}
+
+module.exports = { adminAuthController, adminRegisterController, userAuthController, userRegisterController }

@@ -5,6 +5,7 @@ const cors = require("cors");
 
 const pdfRoute = require("./route/pdfRoute")
 const authRoutes = require("./route/authRoute");
+const adminDashboardRoutes = require("./route/adminDashboardRoute")
 require("dotenv").config();
 
 const PORT = process.env.PORT || 3001;
@@ -38,6 +39,7 @@ mongoose
 // Handle form submission and PDF generation
 app.use("/questionnaire", pdfRoute)
 app.use("/auth", authRoutes)
+app.use("/admin-dashboard", adminDashboardRoutes)
 
 
 // Start Server
