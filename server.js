@@ -5,7 +5,7 @@ const cors = require("cors");
 
 const pdfRoute = require("./route/pdfRoute")
 const authRoutes = require("./route/authRoute");
-const adminDashboardRoutes = require("./route/adminDashboardRoute")
+const adminDashboardRoutes = require("./route/dashboard")
 require("dotenv").config();
 
 const PORT = process.env.PORT || 3001;
@@ -39,7 +39,7 @@ mongoose
 // Handle form submission and PDF generation
 app.use("/questionnaire", pdfRoute)
 app.use("/auth", authRoutes)
-app.use("/admin-dashboard", adminDashboardRoutes)
+app.use("/dashboard", adminDashboardRoutes)
 app.use("/error", (req, res, next) => {
   const error = new Error("Something went wrong!")
   error.status = 500
