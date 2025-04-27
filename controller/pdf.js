@@ -381,6 +381,8 @@ const pdfController = async (req, res) => {
     }
   }
 };
+
+
 const pdfDownloadController = async (req, res) => {
   let filePath;
   try {
@@ -744,6 +746,7 @@ const pdfDownloadController = async (req, res) => {
       stream.on("finish", resolve);
       stream.on("error", reject);
     });
+    console.log(res)
   } catch (err) {
     console.error("Error saving form:", err);
     if (!res.headersSent) {
