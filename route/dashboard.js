@@ -4,8 +4,8 @@ const { viewForms, editForm, viewSingleForm } = require("../controller/adminDash
 const { isAdmin, authenticateUser } = require("../middleware/authMiddleware")
 
 router.get("/all-forms", isAdmin, viewForms)
-router.get("/form/:formId", authenticateUser, isAdmin, viewSingleForm)
-// router.get("/form/student/:formId",authenticateUser,viewSingleForm)
+router.get("/form/:formId", isAdmin, viewSingleForm)
+router.get("/form/student/:formId",authenticateUser,viewSingleForm)
 router.put("/edit-form", isAdmin, editForm)
 
 
