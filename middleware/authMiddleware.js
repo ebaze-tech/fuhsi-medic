@@ -28,27 +28,38 @@ const authenticateUser = async (req, res, next) => {
 }
 
 const isAdmin = async (req, res, next) => {
+    const authHeader = req.headers.authorization;
+
+    if (!authHeader || !authHeader.startsWith("Bearer ")) {
+        return res.status(401).json({ message: "No token provided" });
+    }
+
+    const token = authHeader.split(' ')[1];
+
     try {
-        console.log("Checking admin access for user ID:", req.user?.id)
-
-        if (!req.user || !req.user.id) {
-            console.log("Unauthorized access")
-            return res.status(401).json({ message: "Unauthorized access" })
-        }
-
-        const admin = await Admin.findById(req.user.id)
+        const decoded = jwt.verify(token, secret);
+        const admin = await Admin.findById(decoded.id);
 
         if (!admin) {
-            console.log("Access forbidden")
-            return res.status(403).json({ message: "Access forbidden" })
+            return res.status(403).json({ message: "Access forbidden" });
         }
-        next()
+
+        req.admin = { id: admin._id };
+
+        next();
     } catch (error) {
-        console.error('Admin authentication error:', error.message)
-        return res
-            .status(500)
-            .json({ message: 'Admin authentication error', error: error.message })
+        console.error('Admin authentication error:', error.message);
+
+        if (error.name === "JsonWebTokenError") {
+            return res.status(401).json({ message: "Invalid token" });
+        }
+
+        return res.status(500).json({
+            message: 'Admin authentication error',
+            error: error.message,
+        });
     }
-}
+};
+
 
 module.exports = { authenticateUser, isAdmin }

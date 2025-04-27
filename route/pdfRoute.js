@@ -6,6 +6,6 @@ const { authenticateUser, isAdmin } = require("../middleware/authMiddleware")
 
 router.post('/generate', authenticateUser, pdfController)
 router.get('/:formId/download', authenticateUser, pdfDownloadController)
-router.put('/:formId/update', authenticateUser, isAdmin, pdfUpdateController)
+router.put('/:formId/update', isAdmin, pdfUpdateController)
 
 module.exports = router
