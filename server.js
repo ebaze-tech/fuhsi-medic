@@ -40,6 +40,16 @@ mongoose
 app.use("/questionnaire", pdfRoute)
 app.use("/auth", authRoutes)
 app.use("/admin-dashboard", adminDashboardRoutes)
+app.use("/error", (req, res, next) => {
+  const error = new Error("Something went wrong!")
+  error.status = 500
+  next(error)
+})
+app.use((error, req, res, next) => {
+  console.error(error.stack)
+
+  res.status(error.status || 500).json({ success: false, message: error.message || "Internal Server Error" })
+})
 
 
 // Start Server
