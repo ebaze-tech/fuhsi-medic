@@ -6,15 +6,7 @@ const { ObjectId } = mongoose.Types;
 
 const viewForms = async (req, res) => {
   try {
-    // if (!req.user || !req.user.id) {
-    //   return res.status(401).json({ message: "User not authenticated" });
-    // }
-    // const admin = await Admin.findById(req.user.id).select("email");
-    // if (!admin) {
-    //   return res.status(404).json({ message: "Invalid admin user" });
-    // }
-
-    const forms = await Form.find();
+    const forms = await Form.find().sort({ surname: 1, otherNames: 1 });
     console.log("Form found:", forms);
     return res.status(200).json(forms);
   } catch (error) {
