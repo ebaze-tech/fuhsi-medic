@@ -100,7 +100,7 @@ const userAuthController = async (req, res) => {
   }
 
   try {
-    const user = await User.findOne({ utmeNo, surname }).select("+password");
+    const user = await User.findOne({ utmeNo, surname }).select("otherNames");
 
     if (!user) {
       console.log("Invalid UTME Number or Surname does not match");
