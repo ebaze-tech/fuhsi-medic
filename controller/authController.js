@@ -100,7 +100,8 @@ const userAuthController = async (req, res) => {
   }
 
   try {
-    const user = await User.findOne({ utmeNo, surname }).select("otherNames");
+    const user = await User.findOne({ utmeNo, surname }).select("+password");
+
     if (!user) {
       console.log("Invalid UTME Number or Surname does not match");
       return res
@@ -111,6 +112,7 @@ const userAuthController = async (req, res) => {
     const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET, {
       expiresIn: "1h",
     });
+
     const userDetails = {
       id: user._id,
       surname: user.surname,

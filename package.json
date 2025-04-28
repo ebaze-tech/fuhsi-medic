@@ -1,5 +1,5 @@
 {
-  "name": "server",
+  "name": "fuhsi-medic-server",
   "version": "1.0.0",
   "main": "server.js",
   "scripts": {
