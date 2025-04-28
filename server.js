@@ -3,14 +3,15 @@ const mongoose = require("mongoose");
 const app = express();
 const cors = require("cors");
 
-const pdfRoute = require("./route/pdfRoute")
+const pdfRoute = require("./route/pdfRoute");
 const authRoutes = require("./route/authRoute");
-const adminDashboardRoutes = require("./route/dashboard")
+const adminDashboardRoutes = require("./route/dashboard");
+const getTotalForms = require("./route/formCont");
 require("dotenv").config();
 
 const PORT = process.env.PORT || 3001;
 
-const allowedOrigins = process.env.ALLOWED_ORIGINS
+const allowedOrigins = process.env.ALLOWED_ORIGINS;
 app.use(
   cors({
     origin: (origin, callback) => {
@@ -37,20 +38,23 @@ mongoose
   });
 
 // Handle form submission and PDF generation
-app.use("/questionnaire", pdfRoute)
-app.use("/auth", authRoutes)
-app.use("/dashboard", adminDashboardRoutes)
+app.use("/questionnaire", pdfRoute);
+app.use("/auth", authRoutes);
+app.use("/dashboard", adminDashboardRoutes);
+app.use("/forms", getTotalForms);
 app.use("/error", (req, res, next) => {
-  const error = new Error("Something went wrong!")
-  error.status = 500
-  next(error)
-})
+  const error = new Error("Something went wrong!");
+  error.status = 500;
+  next(error);
+});
 app.use((error, req, res, next) => {
-  console.error(error.stack)
+  console.error(error.stack);
 
-  res.status(error.status || 500).json({ success: false, message: error.message || "Internal Server Error" })
-})
-
+  res.status(error.status || 500).json({
+    success: false,
+    message: error.message || "Internal Server Error",
+  });
+});
 
 // Start Server
 app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
