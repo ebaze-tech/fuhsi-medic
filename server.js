@@ -11,7 +11,8 @@ require("dotenv").config();
 
 const PORT = process.env.PORT || 3001;
 
-const allowedOrigins = process.env.ALLOWED_ORIGINS;
+// CORS setup
+const allowedOrigins = process.env.ALLOWED_ORIGINS?.split(",") || [];
 app.use(
   cors({
     origin: (origin, callback) => {
@@ -26,35 +27,68 @@ app.use(
     credentials: true,
   })
 );
+
 app.use(express.json());
 
-// Connect to MongoDB
-mongoose
-  .connect(process.env.DB_URI, {})
-  .then(() => console.log("MongoDB connected"))
-  .catch((err) => {
-    console.error("MongoDB connection failed:", err);
-    process.exit(1);
-  });
+// MongoDB connection options with timeout
+const dbOptions = {
+  serverSelectionTimeoutMS: 3000, // 3 seconds timeout
+};
 
-// Handle form submission and PDF generation
+const MAX_RETRIES = 3; // maximum retry attempts
+let retries = 0;
+
+async function connectWithRetry() {
+  try {
+    await mongoose.connect(process.env.DB_URI, dbOptions);
+    console.log("✅ MongoDB connected successfully");
+  } catch (error) {
+    retries += 1;
+    console.error(
+      `❌ MongoDB connection failed (Attempt ${retries}):`,
+      error.message
+    );
+
+    if (retries < MAX_RETRIES) {
+      console.log(`🔄 Retrying to connect to MongoDB in 3 seconds...`);
+      setTimeout(connectWithRetry, 3000); // wait 3 seconds then retry
+    } else {
+      console.error(
+        "💥 Could not connect to MongoDB after multiple attempts. Exiting..."
+      );
+      process.exit(1);
+    }
+  }
+}
+
+// Start initial DB connection
+connectWithRetry();
+
+// Routes
 app.use("/questionnaire", pdfRoute);
 app.use("/auth", authRoutes);
 app.use("/dashboard", adminDashboardRoutes);
 app.use("/forms", getTotalForms);
-app.use("/error", (req, res, next) => {
-  const error = new Error("Something went wrong!");
-  error.status = 500;
+
+// 404 Handler
+app.use((req, res, next) => {
+  const error = new Error(`Route ${req.originalUrl} not found`);
+  error.status = 404;
   next(error);
 });
-app.use((error, req, res, next) => {
-  console.error(error.stack);
 
-  res.status(error.status || 500).json({
+// Global Error Handler
+app.use((error, req, res, next) => {
+  console.error(`[ERROR] ${error.message}`);
+
+  const statusCode = error.status || 500;
+
+  res.status(statusCode).json({
     success: false,
     message: error.message || "Internal Server Error",
+    stack: process.env.NODE_ENV === "production" ? undefined : error.stack,
   });
 });
 
 // Start Server
-app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
+app.listen(PORT, () => console.log(`🚀 Server running on port ${PORT}`));
