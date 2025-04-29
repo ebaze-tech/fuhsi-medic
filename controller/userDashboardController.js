@@ -1,7 +1,7 @@
 const User = require("../model/userSchema.js")
 const Form = require("../model/formSchema.js")
 
-const viewSingleForm = async (req, res) => {
+const viewSingleForm = async (req, res, next) => {
     try {
         const { formId } = req.params
         const form = await Form.findById(formId)
@@ -13,6 +13,7 @@ const viewSingleForm = async (req, res) => {
 
         console.log("Form found:", form)
         return res.status(200).json(form)
+        next()
     } catch (error) {
         console.error("Error retrieving form", error.message)
         return res.status(500).json({ message: "Internal Server Error", error: error.message })
