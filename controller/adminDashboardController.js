@@ -4,11 +4,12 @@ const Form = require("../model/formSchema.js");
 const mongoose = require("mongoose");
 const { ObjectId } = mongoose.Types;
 
-const viewForms = async (req, res) => {
+const viewForms = async (req, res, next) => {
   try {
     const forms = await Form.find().sort({ surname: 1, otherNames: 1 });
     console.log("Form found:", forms);
     return res.status(200).json(forms);
+    next()
   } catch (error) {
     console.error("Error:", error);
     return res
@@ -17,7 +18,7 @@ const viewForms = async (req, res) => {
   }
 };
 
-const userForm = async (req, res) => {
+const userForm = async (req, res, next) => {
   try {
     const user = await User.findById(req.user.id).select("surname");
     console.log(user);
@@ -29,6 +30,7 @@ const userForm = async (req, res) => {
 
     console.log("Forms found:", forms);
     return res.status(200).json(forms);
+    next()
   } catch (error) {
     console.error("Error fetching forms:", error);
     return res
@@ -37,7 +39,7 @@ const userForm = async (req, res) => {
   }
 };
 
-const viewSingleForm = async (req, res) => {
+const viewSingleForm = async (req, res, next) => {
   try {
     // if (!req.user || !req.user.id) {
     //   return res
@@ -67,6 +69,7 @@ const viewSingleForm = async (req, res) => {
 
     console.log("Form found:", form);
     return res.status(200).json(form);
+    next()
   } catch (error) {
     console.error("Error retrieving form", error.message);
     return res
@@ -75,7 +78,7 @@ const viewSingleForm = async (req, res) => {
   }
 };
 
-const editForm = async (req, res) => {
+const editForm = async (req, res, next) => {
   const formData = req.body;
 
   try {
@@ -102,6 +105,7 @@ const editForm = async (req, res) => {
       message: "Form updated successfully",
       updatedForm,
     });
+    next()
   } catch (error) {
     console.error("Error updating form:", error.message);
     return res
