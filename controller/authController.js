@@ -100,22 +100,19 @@ const userAuthController = async (req, res) => {
   }
 
   try {
-    // ✅ Use findOne() instead of find()
     const user = await User.findOne({ utmeNo });
-    console.log(user); // Log the user object (not an array)
+    console.log(user);
 
     if (!user) {
       console.log("Invalid UTME Number");
       return res.status(400).json({ message: "Invalid UTME Number" });
     }
     
-    // ✅ Compare surnames (case-insensitive)
     if (user.surname.toLowerCase() !== surname.toLowerCase()) {
       console.log("Surname does not match");
       return res.status(400).json({ message: "Surname does not match" });
     }
 
-    // ✅ Generate token if checks pass
     const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET, {
       expiresIn: "1h",
     });
