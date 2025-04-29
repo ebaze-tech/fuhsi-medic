@@ -1,12 +1,13 @@
 const Form = require("../model/formSchema");
 
-const getTotalForms = async (req, res) => {
+const getTotalForms = async (req, res, next) => {
   try {
     const totalForms = await Form.countDocuments();
 
     return res
       .status(200)
       .json({ message: "Total forms fetched successfully", total: totalForms });
+    next()
   } catch (error) {
     console.error("Error fetching total forms:", error);
     return res.status(500).json({
