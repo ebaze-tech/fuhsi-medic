@@ -6,15 +6,15 @@ const bcrypt = require("bcryptjs");
 
 require("dotenv").config();
 
-const adminAuthController = async (req, res) => {
+const adminAuthController = async (req, res, next) => {
+try {
   const { email, password } = req.body;
 
   if (!email || !password) {
     console.log("Email and password are required");
     return res.status(400).json({ message: "Email and password are required" });
   }
-
-  try {
+  
     const user = await Admin.findOne({ email });
     if (!user) {
       console.log("Invalid email");
@@ -40,21 +40,22 @@ const adminAuthController = async (req, res) => {
       user: userDetails,
       token,
     });
+    next()
   } catch (error) {
     console.error("Login error:", error);
     return res.status(500).json({ message: "Login error: ", error });
   }
 };
 
-const adminRegisterController = async (req, res) => {
+const adminRegisterController = async (req, res, next) => {
+  try {
   const { email, password } = req.body;
 
   if (!email || !password) {
     console.log("All fields are required");
     return res.status(400).json({ message: "All fields are required" });
   }
-
-  try {
+    
     const existingUserByEmail = await Admin.findOne({ email });
     if (existingUserByEmail) {
       console.log("Email is already in use");
@@ -85,12 +86,14 @@ const adminRegisterController = async (req, res) => {
       },
       token,
     });
+    next()
   } catch (error) {
     console.error("Registration error:", error);
     res.status(500).json({ message: "Error registering user", error });
   }
 };
-const userAuthController = async (req, res) => {
+const userAuthController = async (req, res, next) => {
+ try {
   const { surname, utmeNo } = req.body;
   if (!surname || !utmeNo) {
     console.log("UTME Number and Surname are required");
@@ -98,24 +101,20 @@ const userAuthController = async (req, res) => {
       .status(400)
       .json({ message: "UTME Number and Surname are required" });
   }
-
   try {
-    // ✅ Use findOne() instead of find()
     const user = await User.findOne({ utmeNo });
-    console.log(user); // Log the user object (not an array)
-
+    console.log(user);
+    
     if (!user) {
       console.log("Invalid UTME Number");
       return res.status(400).json({ message: "Invalid UTME Number" });
     }
     
-    // ✅ Compare surnames (case-insensitive)
     if (user.surname.toLowerCase() !== surname.toLowerCase()) {
       console.log("Surname does not match");
       return res.status(400).json({ message: "Surname does not match" });
     }
 
-    // ✅ Generate token if checks pass
     const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET, {
       expiresIn: "1h",
     });
@@ -134,6 +133,7 @@ const userAuthController = async (req, res) => {
         user: userDetails,
       },
     });
+    next()
   } catch (error) {
     console.error("Login error:", error);
     return res
@@ -141,15 +141,14 @@ const userAuthController = async (req, res) => {
       .json({ message: "Login error:", error: error.message });
   }
 };
-const userRegisterController = async (req, res) => {
-  const { utmeNo, surname } = req.body;
-
+const userRegisterController = async (req, res, next) => {
+  try {
+      const { utmeNo, surname } = req.body;
+    
   if (!utmeNo || !surname) {
     console.log("All fields are required");
     return res.status(400).json({ message: "All fields are required" });
   }
-
-  try {
     const existingUserByUtmeNo = await User.findOne({ utmeNo });
     if (existingUserByUtmeNo) {
       console.log("UTME Number is already in use");
@@ -183,6 +182,7 @@ const userRegisterController = async (req, res) => {
       },
       token,
     });
+    next()
   } catch (error) {
     console.error("Registration error:", error);
     res.status(500).json({ message: "Error registering user", error });
