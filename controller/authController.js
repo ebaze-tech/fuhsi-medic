@@ -101,14 +101,18 @@ const userAuthController = async (req, res, next) => {
       .status(400)
       .json({ message: "UTME Number and Surname are required" });
   }
-   
-    const user = await User.findOne({ utmeNo, surname }).select("surname utmeNo otherNames");
-
+  try {
+    const user = await User.findOne({ utmeNo });
+    console.log(user);
+    
     if (!user) {
-      console.log("Invalid UTME Number or Surname does not match");
-      return res
-        .status(400)
-        .json({ message: "Invalid UTME Number or Surname does not match" });
+      console.log("Invalid UTME Number");
+      return res.status(400).json({ message: "Invalid UTME Number" });
+    }
+    
+    if (user.surname.toLowerCase() !== surname.toLowerCase()) {
+      console.log("Surname does not match");
+      return res.status(400).json({ message: "Surname does not match" });
     }
 
     const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET, {
@@ -120,6 +124,7 @@ const userAuthController = async (req, res, next) => {
       surname: user.surname,
       utmeNo: user.utmeNo,
     };
+
     console.log("Login successful", { user: userDetails, token });
     return res.status(200).json({
       message: "Login successful",
@@ -136,11 +141,10 @@ const userAuthController = async (req, res, next) => {
       .json({ message: "Login error:", error: error.message });
   }
 };
-
 const userRegisterController = async (req, res, next) => {
   try {
       const { utmeNo, surname } = req.body;
-
+    
   if (!utmeNo || !surname) {
     console.log("All fields are required");
     return res.status(400).json({ message: "All fields are required" });
