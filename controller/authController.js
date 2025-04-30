@@ -28,7 +28,7 @@ const adminAuthController = async (req, res) => {
     }
 
     const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET, {
-      expiresIn: process.env.JWT_EXPIRES_IN || "1h",
+      expiresIn: process.env.JWT_EXPIRES_IN,
     });
     const userDetails = {
       id: user._id,
@@ -73,7 +73,7 @@ const adminRegisterController = async (req, res) => {
 
     // Generate JWT token
     const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET, {
-      expiresIn: "1h",
+      expiresIn: process.env.JWT_EXPIRES_IN,
     });
 
     console.log("Admin registered successfully:", { user, token });
@@ -107,7 +107,7 @@ const userAuthController = async (req, res) => {
     }
 
     const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET, {
-      expiresIn: "1h",
+      expiresIn: process.env.JWT_EXPIRES_IN,
     });
 
     const userDetails = {
@@ -161,7 +161,7 @@ const userRegisterController = async (req, res) => {
 
     // Generate JWT token
     const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET, {
-      expiresIn: "1h",
+      expiresIn: process.env.JWT_EXPIRES_IN,
     });
 
     console.log("User registered successfully:", { user, token });
