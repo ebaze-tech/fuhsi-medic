@@ -91,12 +91,10 @@ const adminRegisterController = async (req, res) => {
   }
 };
 const userAuthController = async (req, res) => {
-  const { surname, utmeNo } = req.body;
-  if (!surname || !utmeNo) {
-    console.log("UTME Number and Surname are required");
-    return res
-      .status(400)
-      .json({ message: "UTME Number and Surname are required" });
+  const { utmeNo } = req.body;
+  if (!utmeNo) {
+    console.log("UTME Number are required");
+    return res.status(400).json({ message: "UTME Number are required" });
   }
 
   try {
@@ -106,11 +104,6 @@ const userAuthController = async (req, res) => {
     if (!user) {
       console.log("Invalid UTME Number");
       return res.status(400).json({ message: "Invalid UTME Number" });
-    }
-    
-    if (user.surname.toLowerCase() !== surname.toLowerCase()) {
-      console.log("Surname does not match");
-      return res.status(400).json({ message: "Surname does not match" });
     }
 
     const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET, {
