@@ -26,7 +26,7 @@ const pdfController = async (req, res) => {
     console.log("Form saved");
 
     const doc = new PDFDocument({ margin: 50 });
-    const fileName = `${formData.surname}-${formData.otherNames}-questionnaire-response.pdf`;
+    const fileName = `${formData.surname}-${formData.otherNames}-new-questionnaire-response.pdf`;
     const filePath = path.join(
       __dirname,
       "..",
@@ -34,15 +34,23 @@ const pdfController = async (req, res) => {
       fileName
     );
 
+    // if (!fs.existsSync(path.dirname(filePath))) {
+    //   fs.mkdirSync(path.dirname(filePath), { recursive: true });
+    // }
+
+    // const stream = fs.createWriteStream(filePath);
+
+    // res.setHeader("Content-Type", "application/pdf");
+    // res.setHeader("Content-Disposition", `attachment; filename="${fileName}"`);
+
+    // doc.pipe(stream);
+    // doc.pipe(res);
+
     if (!fs.existsSync(path.dirname(filePath))) {
       fs.mkdirSync(path.dirname(filePath), { recursive: true });
     }
 
     const stream = fs.createWriteStream(filePath);
-
-    res.setHeader("Content-Type", "application/pdf");
-    res.setHeader("Content-Disposition", `attachment; filename="${fileName}"`);
-
     doc.pipe(stream);
     doc.pipe(res);
 
@@ -377,19 +385,19 @@ const pdfController = async (req, res) => {
       stream.on("finish", resolve);
       stream.on("error", reject);
     });
-    console.log(res);
+
+    res.download(filePath, fileName, (err) => {
+      if (err) {
+        console.error("Error sending file:", err);
+        if (!res.headersSent) {
+          res.status(500).send("Error sending file");
+        }
+      }
+    });
   } catch (err) {
     console.error("Error saving form:", err);
     if (!res.headersSent) {
-      return res.status(500).json({ message: "Error generating PDF" });
-    }
-  } finally {
-    if (filePath && fs.existsSync(filePath)) {
-      try {
-        fs.unlinkSync(filePath);
-      } catch (unlinkErr) {
-        console.error("Error deleting temp file:", unlinkErr);
-      }
+      res.status(500).json({ message: "Error generating PDF" });
     }
   }
 };
