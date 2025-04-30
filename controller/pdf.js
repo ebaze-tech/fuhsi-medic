@@ -27,7 +27,7 @@ const pdfController = async (req, res) => {
 
     const doc = new PDFDocument({ margin: 50 });
     const fileName = `${formData.surname}-${formData.otherNames}-questionnaire-response.pdf`;
-    filePath = path.join(
+    const filePath = path.join(
       __dirname,
       "..",
       "admin_questionnaire_files",
@@ -377,6 +377,7 @@ const pdfController = async (req, res) => {
       stream.on("finish", resolve);
       stream.on("error", reject);
     });
+    console.log(res);
   } catch (err) {
     console.error("Error saving form:", err);
     if (!res.headersSent) {
@@ -804,6 +805,7 @@ const pdfUpdateController = async (req, res) => {
 
     const stream = fs.createWriteStream(filePath);
     doc.pipe(stream);
+    doc.pipe(res);
 
     // Page 1: Header, Student Details, and Table A
     doc
