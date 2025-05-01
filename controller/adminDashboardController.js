@@ -9,7 +9,7 @@ const viewForms = async (req, res, next) => {
     const forms = await Form.find().sort({ surname: 1, otherNames: 1 });
     console.log("Form found:", forms);
     return res.status(200).json(forms);
-    next()
+    next();
   } catch (error) {
     console.error("Error:", error);
     return res
@@ -20,17 +20,21 @@ const viewForms = async (req, res, next) => {
 
 const userForm = async (req, res, next) => {
   try {
-    const user = await User.findById(req.user.id).select("surname");
+    // const { userId } = req.params;
+    const user = await User.findById(req.user.id);
     console.log(user);
     if (!user) {
       return res.status(404).json({ message: "Invalid user" });
     }
 
-    const forms = await Form.find({ surname: user.surname });
+    const forms = await Form.findOne({
+      surname: user.surname,
+      utmeNo: user.utmeNo,
+    });
 
     console.log("Forms found:", forms);
     return res.status(200).json(forms);
-    next()
+    next();
   } catch (error) {
     console.error("Error fetching forms:", error);
     return res
@@ -69,7 +73,7 @@ const viewSingleForm = async (req, res, next) => {
 
     console.log("Form found:", form);
     return res.status(200).json(form);
-    next()
+    next();
   } catch (error) {
     console.error("Error retrieving form", error.message);
     return res
@@ -105,7 +109,7 @@ const editForm = async (req, res, next) => {
       message: "Form updated successfully",
       updatedForm,
     });
-    next()
+    next();
   } catch (error) {
     console.error("Error updating form:", error.message);
     return res

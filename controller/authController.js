@@ -91,19 +91,23 @@ const adminRegisterController = async (req, res) => {
   }
 };
 const userAuthController = async (req, res) => {
-  const { utmeNo } = req.body;
-  if (!utmeNo) {
-    console.log("UTME Number are required");
-    return res.status(400).json({ message: "UTME Number are required" });
+  const { utmeNo, surname } = req.body;
+  if (!utmeNo || !surname) {
+    console.log("UTME Number and Surname are required");
+    return res
+      .status(400)
+      .json({ message: "UTME Number and Surname are required" });
   }
 
   try {
-    const user = await User.findOne({ utmeNo });
+    const user = await User.findOne({ utmeNo, surname });
     console.log(user);
 
     if (!user) {
-      console.log("Invalid UTME Number");
-      return res.status(400).json({ message: "Invalid UTME Number" });
+      console.log("Invalid UTME Number or Wrong Surname");
+      return res
+        .status(400)
+        .json({ message: "Invalid UTME Number or Wrong Surname" });
     }
 
     const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET, {
@@ -114,6 +118,7 @@ const userAuthController = async (req, res) => {
       id: user._id,
       surname: user.surname,
       utmeNo: user.utmeNo,
+      otherNames: user.otherNames,
     };
 
     console.log("Login successful", { user: userDetails, token });
