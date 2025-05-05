@@ -32,10 +32,10 @@ app.use(express.json());
 
 // MongoDB connection options with timeout
 const dbOptions = {
-  serverSelectionTimeoutMS: 3000, // 3 seconds timeout
+  serverSelectionTimeoutMS: 7000, // 3 seconds timeout
 };
 
-const MAX_RETRIES = 3; // maximum retry attempts
+const MAX_RETRIES = 10; // maximum retry attempts
 let retries = 0;
 
 async function connectWithRetry() {

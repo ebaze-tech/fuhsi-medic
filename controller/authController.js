@@ -90,6 +90,7 @@ const adminRegisterController = async (req, res) => {
     res.status(500).json({ message: "Error registering user", error });
   }
 };
+
 const userAuthController = async (req, res) => {
   const { utmeNo, surname } = req.body;
   if (!utmeNo || !surname) {
