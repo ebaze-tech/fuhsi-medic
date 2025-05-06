@@ -51,8 +51,7 @@ const pdfController = async (req, res) => {
     }
 
     const stream = fs.createWriteStream(filePath);
-    doc.pipe(stream);
-    doc.pipe(res);
+doc.pipe(stream);
 
     // Page 1: Header, Student Details, and Table A
     doc
@@ -762,7 +761,9 @@ const pdfDownloadController = async (req, res) => {
     doc.end();
 
     await new Promise((resolve, reject) => {
-      stream.on("finish", resolve);
+      stream.on("finish", resolve, () => {
+  res.download(filePath, fileName);
+});
       stream.on("error", reject);
     });
     console.log(res);
