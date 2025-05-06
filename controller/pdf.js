@@ -399,6 +399,7 @@ doc.pipe(stream);
       res.status(500).send("An error occurred while processing the request.");
     }
   }
+}
 
 const pdfDownloadController = async (req, res) => {
   let filePath;
@@ -1171,5 +1172,6 @@ const pdfUpdateController = async (req, res) => {
       res.status(500).send("An error occurred while processing the request.");
     }
   }
+}
 
 module.exports = { pdfController, pdfDownloadController, pdfUpdateController };
