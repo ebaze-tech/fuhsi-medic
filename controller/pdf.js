@@ -393,13 +393,12 @@ doc.pipe(stream);
         }
       }
     });
-  } catch (err) {
+   } catch (err) {
     console.error("Error saving form:", err);
     if (!res.headersSent) {
-      res.status(500).json({ message: "Error generating PDF" });
+      res.status(500).send("An error occurred while processing the request.");
     }
   }
-};
 
 const pdfDownloadController = async (req, res) => {
   let filePath;
@@ -770,9 +769,10 @@ const pdfDownloadController = async (req, res) => {
   } catch (err) {
     console.error("Error saving form:", err);
     if (!res.headersSent) {
-      return res.status(500).json({ message: "Error generating PDF" });
+      res.status(500).send("An error occurred while processing the request.");
     }
-  } finally {
+  }
+ finally {
     if (filePath && fs.existsSync(filePath)) {
       try {
         fs.unlinkSync(filePath);
@@ -1166,19 +1166,10 @@ const pdfUpdateController = async (req, res) => {
       // }
     });
   } catch (err) {
-    console.error("Error updating form:", err);
-
-    // if (filePath && fs.existsSync(filePath)) {
-    //     try {
-    //         fs.unlinkSync(filePath);
-    //     } catch (unlinkErr) {
-    //         console.error('Error deleting temp file:', unlinkErr);
-    //     }
-    // }
-
+    console.error("Error saving form:", err);
     if (!res.headersSent) {
-      res.status(500).json({ message: "Error generating PDF" });
+      res.status(500).send("An error occurred while processing the request.");
     }
   }
-};
+
 module.exports = { pdfController, pdfDownloadController, pdfUpdateController };
