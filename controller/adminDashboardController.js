@@ -20,21 +20,27 @@ const viewForms = async (req, res, next) => {
 
 const userForm = async (req, res, next) => {
   try {
-    // const { userId } = req.params;
     const user = await User.findById(req.user.id);
-    console.log(user);
     if (!user) {
       return res.status(404).json({ message: "Invalid user" });
     }
 
+    const normalize = (str) => str.trim().replace(/\s+/g, "\\s*");
+
     const forms = await Form.findOne({
+      surname: new RegExp(`^${normalize(user.surname)}$`, "i"),
+      jambRegNo: new RegExp(`^${normalize(user.utmeNo)}$`, "i"),
+      otherNames: new RegExp(`^${normalize(user.otherNames)}$`, "i"),
+    });
+
+    console.log("Querying Form with:", {
       surname: user.surname,
-      utmeNo: user.utmeNo,
+      otherNames: user.otherNames,
+      jambRegNo: user.utmeNo,
     });
 
     console.log("Forms found:", forms);
     return res.status(200).json(forms);
-    next();
   } catch (error) {
     console.error("Error fetching forms:", error);
     return res
