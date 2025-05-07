@@ -28,8 +28,8 @@ const pdfController = async (req, res) => {
     const doc = new PDFDocument({ margin: 50 });
     const fileName = `${formData.surname}-${formData.otherNames}-new-questionnaire-response.pdf`;
     const filePath = path.join(
-      __dirname,
-      "..",
+      // __dirname,
+      "/disk",
       "admin_questionnaire_files",
       fileName
     );
@@ -419,8 +419,8 @@ const pdfDownloadController = async (req, res) => {
     const doc = new PDFDocument({ margin: 50 });
     const fileName = `${form.surname}-${form.otherNames}-questionnaire-response-${formId}.pdf`;
     const filePath = path.join(
-      __dirname,
-      "..",
+      // __dirname,
+      "/disk",
       "users'_downloaded_files",
       fileName
     );
@@ -803,8 +803,8 @@ const pdfUpdateController = async (req, res) => {
     const doc = new PDFDocument({ margin: 50 });
     const fileName = `${formData.surname}-${formData.otherNames}-updated-questionnaire-response.pdf`;
     filePath = path.join(
-      __dirname,
-      "..",
+      // __dirname,
+      "/disk",
       "admin_updated_questionnaire_files",
       fileName
     );
