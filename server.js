@@ -65,6 +65,19 @@ async function connectWithRetry() {
 connectWithRetry();
 
 // Routes
+app.get("/api", (req, res) => {
+  res.json({message: `Server running smoothly on ${PORT}!`});
+});
+
+app.get("/health", (req, res) => {
+  res.json({ status: "ok", uptime: process.uptime() });
+});
+
+app.get("/db-status", async (req, res) => {
+  const state = mongoose.connection.readyState; // 1 means connected
+  res.json({ dbConnected: state === 1 });
+});
+
 app.use("/questionnaire", pdfRoute);
 app.use("/auth", authRoutes);
 app.use("/dashboard", adminDashboardRoutes);
@@ -88,10 +101,6 @@ app.use((error, req, res, next) => {
     message: error.message || "Internal Server Error",
     stack: process.env.NODE_ENV === "production" ? undefined : error.stack,
   });
-});
-
-app.get("/api", (req, res) => {
-  res.send(`Server running smoothly on ${PORT}!`);
 });
 
 // Start Server
