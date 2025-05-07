@@ -90,5 +90,9 @@ app.use((error, req, res, next) => {
   });
 });
 
+app.get("/api", (req, res) => {
+  res.send(`Server running smoothly on ${PORT}!`);
+});
+
 // Start Server
 app.listen(PORT, () => console.log(`🚀 Server running on port ${PORT}`));
